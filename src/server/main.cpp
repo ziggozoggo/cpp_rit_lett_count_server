@@ -5,6 +5,6 @@
 int main() {
   EchoServer a;
   //std::cout << a.get_info() << std::endl;
-  a.start_server();
+  a.start_server(echo_func);
   return 0;
 }

@@ -15,6 +15,7 @@
 #define DEF_PORT 9090
 #define DEF_START_MSG "RIT LETT CNT SRVR v0.1\n\r"
 #define DEF_MAX_CONN 30
+#define DEF_PENDING_CONN 3
 
 class EchoServer {
   public:
@@ -22,7 +23,7 @@ class EchoServer {
     EchoServer(int port, int max_conn) noexcept;
 
     std::string get_info() noexcept;
-    void start_server();
+    void start_server(std::string (*func)());
 
   private:
     int max_conn_;
@@ -34,7 +35,11 @@ class EchoServer {
     void address_init() noexcept;
     void set_master_socket();
     void bind_master_socket();
+    int listen_master_socket();
+    void main_server_loop(int *addrlen, std::string (*func)());
 };
+
+std::string echo_func();
 
 #endif // SRC_SERVER_H_
 
