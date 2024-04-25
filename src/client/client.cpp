@@ -12,8 +12,18 @@ SimlpeClientTCP::SimlpeClientTCP(int port, std::string ip_addr) noexcept {
 /* Main methods */
 void SimlpeClientTCP::client_start() {
   int client_socket = this->create_socket();
-  this->connect_to_server(client_socket);
-  this->client_main_loop(client_socket);
+  
+  try {
+    this->connect_to_server(client_socket);
+    this->client_main_loop(client_socket);
+  } 
+  catch (const ClientConnectToServerFailed& err) {
+    std::cout << "Connect to server failed" << std::endl;
+  } 
+  catch (const ClientServerConnectionLost& err) {
+    std::cout << "Connection to server lost" << std::endl;
+  } 
+
   close(client_socket);
 }
 
@@ -27,8 +37,7 @@ void SimlpeClientTCP::client_init(int port, std::string ip_addr) noexcept {
 int SimlpeClientTCP::create_socket() {
   int client_socket = socket(AF_INET, SOCK_STREAM, 0);
   if (client_socket == -1) {
-    //TODO Throw exception "Create socket error"
-    std::cout << "Create socket error" << std::endl;
+    throw ClientCreateSocketFailed("Create socket error");
   }
   return client_socket;
 }
@@ -36,8 +45,7 @@ int SimlpeClientTCP::create_socket() {
 int SimlpeClientTCP::connect_to_server(int client_socket) {
   int connect_res = connect(client_socket, (sockaddr *)&client_, sizeof(client_));
   if (connect_res == -1) {
-    //TODO Throw exception "Connect to server failed"
-    std::cout << "Connect to server failed" << std::endl;
+    throw ClientConnectToServerFailed("Connect to server failed");
   }
   return 0;
 }
@@ -53,6 +61,11 @@ void SimlpeClientTCP::client_main_loop(int client_socket) {
     // Send data to server
     this->send_data_to_server(client_socket, user_input);
     int bytes_recieved = recv(client_socket, buf, BUFSIZ, 0);
+
+    if (!bytes_recieved) {
+      throw ClientServerConnectionLost("Connection to server lost");
+    }
+
     this->print_message(std::string(buf, bytes_recieved)); 
   }
 }
@@ -60,8 +73,8 @@ void SimlpeClientTCP::client_main_loop(int client_socket) {
 int  SimlpeClientTCP::send_data_to_server(int client_socket, std::string data) {
   int send_res = send(client_socket, data.c_str(), data.size() + 1, 0);
   if (send_res == -1) {
-    //TODO Throw exception "Could not send data to server"
     std::cout << "Could not send data to server" << std::endl;
+    throw ClientServerConnectionLost("Connection to server lost");
   }
   return 0;
 }

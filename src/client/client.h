@@ -11,6 +11,8 @@
 #include <arpa/inet.h>
 #include <string.h>
 
+#include "client_exceptions.h"
+
 #define DEF_PORT 9090
 #define DEF_IP "127.0.0.1"
 
