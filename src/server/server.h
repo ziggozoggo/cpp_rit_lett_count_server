@@ -11,9 +11,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <string.h>
+#include <ctype.h>
 
 #define DEF_PORT 9090
-#define DEF_START_MSG "RIT LETT CNT SRVR v0.1\n\r"
 #define DEF_MAX_CONN 30
 #define DEF_PENDING_CONN 3
 
@@ -27,7 +27,6 @@ class EchoServer {
 
   private:
     int max_conn_;
-    std::string hello_message_;
     sockaddr_in address_;
     //...
     int master_socket_;

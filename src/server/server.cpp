@@ -2,20 +2,17 @@
 
 /* Constructors */
 EchoServer::EchoServer() noexcept : max_conn_(DEF_MAX_CONN), master_socket_(0) {
-  hello_message_ = DEF_START_MSG;
   address_.sin_port = htons(DEF_PORT);
   this->address_init();  
 }
 
 EchoServer::EchoServer(int port, int max_conn) noexcept : max_conn_(max_conn), master_socket_(0) {
-  hello_message_ = DEF_START_MSG;
   address_.sin_port = htons(port);
   this->address_init();
 }
 
 /* Main methods */
 void EchoServer::start_server(std::string (*func)(std::string)) {
-  //TODO...
   this->set_master_socket();
   this->bind_master_socket();
   int addrlen = this->listen_master_socket();
@@ -30,7 +27,7 @@ std::string EchoServer::get_info() noexcept {
   return buffer;
 }
 
-/* Private utils */
+/* Private method */
 void EchoServer::address_init() noexcept {
   address_.sin_family = AF_INET;
   address_.sin_addr.s_addr = INADDR_ANY;
@@ -120,15 +117,6 @@ void EchoServer::main_server_loop(int *addrlen, std::string (*func)(std::string)
 			printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , new_socket , inet_ntoa(address_.sin_addr) , ntohs 
 				    (address_.sin_port));
       
-      const char* message = hello_message_.c_str(); 
-      int send_code = send(new_socket, message, strlen(message), 0);
-      if (send_code != strlen(message)) {
-        //TODO throw error: "Send hello message to client failed"
-        printf("Send hello message to client failed");
-      } else {
-        puts("Welcome message sent successfully");
-      } 
-
       // Add new socket to array
       for (int i = 0; i < max_conn_; i++) {
         if (!client_socket[i]) {
@@ -159,13 +147,21 @@ void EchoServer::main_server_loop(int *addrlen, std::string (*func)(std::string)
           } 
         } else {
           //TODO Do Work
-          std::string inpt = "Hello from server\r\n";
-          std::string tmp = func(inpt);
+          buffer[valread] = '\0';
 
+          std::string tmp = func(std::string(buffer, valread + 1));
           int send_res = send(sd, tmp.c_str(), strlen(tmp.c_str()), 0);
           if (send_res < 0) {
             printf("Send message failed....");
           }
+    
+          // std::string inpt = "Hello from server\r\n";
+          // std::string tmp = func(inpt);
+
+          // int send_res = send(sd, tmp.c_str(), strlen(tmp.c_str()), 0);
+          // if (send_res < 0) {
+          //   printf("Send message failed....");
+          // }
 
           // buffer[valread] = '\0';
           // send(sd, buffer, strlen(buffer), 0);
