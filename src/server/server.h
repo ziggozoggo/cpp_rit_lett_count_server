@@ -23,7 +23,7 @@ class EchoServer {
     EchoServer(int port, int max_conn) noexcept;
 
     std::string get_info() noexcept;
-    void start_server(std::string (*func)());
+    void start_server(std::string (*func)(std::string));
 
   private:
     int max_conn_;
@@ -36,10 +36,10 @@ class EchoServer {
     void set_master_socket();
     void bind_master_socket();
     int listen_master_socket();
-    void main_server_loop(int *addrlen, std::string (*func)());
+    void main_server_loop(int *addrlen, std::string (*func)(std::string));
 };
 
-std::string echo_func();
+std::string echo_func(std::string str);
 
 #endif // SRC_SERVER_H_
 

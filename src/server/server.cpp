@@ -14,7 +14,7 @@ EchoServer::EchoServer(int port, int max_conn) noexcept : max_conn_(max_conn), m
 }
 
 /* Main methods */
-void EchoServer::start_server(std::string (*func)()) {
+void EchoServer::start_server(std::string (*func)(std::string)) {
   //TODO...
   this->set_master_socket();
   this->bind_master_socket();
@@ -72,7 +72,7 @@ int EchoServer::listen_master_socket() {
   return sizeof(address_); 
 }
 
-void EchoServer::main_server_loop(int *addrlen, std::string (*func)()) {
+void EchoServer::main_server_loop(int *addrlen, std::string (*func)(std::string)) {
   int max_sd = 0;
   int sd = 0;
   int activity = 0;
@@ -139,7 +139,6 @@ void EchoServer::main_server_loop(int *addrlen, std::string (*func)()) {
       }
     }
 
-    std::cout << "142: "<<errno << std::endl;
     // IO on other socket
     for (int i = 0; i < max_conn_; i++) {
       sd = client_socket[i];
@@ -153,15 +152,15 @@ void EchoServer::main_server_loop(int *addrlen, std::string (*func)()) {
 						inet_ntoa(address_.sin_addr) , ntohs(address_.sin_port));
           close(sd);
           client_socket[i] = 0;
+          
           //TODO: Log client SIGPIPE
           if (valread == -1) {
             std::cout << "149: "<< errno << " valread is " << valread << std::endl;
           } 
         } else {
           //TODO Do Work
-          std::string tmp = func();
-
-
+          std::string inpt = "Hello from server\r\n";
+          std::string tmp = func(inpt);
 
           int send_res = send(sd, tmp.c_str(), strlen(tmp.c_str()), 0);
           if (send_res < 0) {
@@ -177,6 +176,6 @@ void EchoServer::main_server_loop(int *addrlen, std::string (*func)()) {
 }
 
 /* EXPERIMENTS */
-std::string echo_func() {
-  return "Hello from echo func!\n";
+std::string echo_func(std::string str) {
+  return str;
 }
