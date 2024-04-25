@@ -24,9 +24,9 @@ TARGET_CL := build/client_run
 TARGET_SR := build/server_run
 
 TEST_DIR := unit_tests
-TEST_EXE := s21_containers_test.exe
+TEST_EXE := run_tests.exe
 
-.PHONY: all server client 
+.PHONY: all server client test
 .DELETE_ON_ERROR:
 
 all: server client
@@ -34,6 +34,10 @@ all: server client
 client: $(TARGET_CL)
 
 server: $(TARGET_SR)
+
+test: $(SERVER_OBJ)
+	cd $(TEST_DIR) && make
+	cd $(TEST_DIR) && ./$(TEST_EXE)
 
 $(TARGET_CL): $(CLIENT_OBJ)
 	$(CC) $(CFLAGS) $(CLIENT_OBJ) -o $@ $(LIBS)
@@ -54,6 +58,7 @@ clean_obj:
 	cd $(BUILD_DIR_CL) && rm -rf *.o *.a *.exe *.so
 	cd $(BUILD_DIR_SR) && rm -rf *.o *.a *.exe *.so
 	rm -rf *.o *.a *.exe *.so
+	cd $(TEST_DIR) && make clean
 
 clean: clean_obj 
 
