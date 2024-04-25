@@ -139,24 +139,34 @@ void EchoServer::main_server_loop(int *addrlen, std::string (*func)()) {
       }
     }
 
+    std::cout << "142: "<<errno << std::endl;
     // IO on other socket
     for (int i = 0; i < max_conn_; i++) {
       sd = client_socket[i];
       if (FD_ISSET(sd, &readfds)) {
         
         valread = read(sd, buffer, 1024);
-        if (!valread) {
+        if (valread < 1) {
           // Closing connection
           getpeername(sd , (struct sockaddr*)&address_ , (socklen_t*)addrlen);
           printf("Host disconnected , ip %s , port %d \n" , 
 						inet_ntoa(address_.sin_addr) , ntohs(address_.sin_port));
           close(sd);
-          client_socket[i] = 0; 
+          client_socket[i] = 0;
+          //TODO: Log client SIGPIPE
+          if (valread == -1) {
+            std::cout << "149: "<< errno << " valread is " << valread << std::endl;
+          } 
         } else {
           //TODO Do Work
           std::string tmp = func();
 
-          send(sd, tmp.c_str(), strlen(tmp.c_str()), 0);
+
+
+          int send_res = send(sd, tmp.c_str(), strlen(tmp.c_str()), 0);
+          if (send_res < 0) {
+            printf("Send message failed....");
+          }
 
           // buffer[valread] = '\0';
           // send(sd, buffer, strlen(buffer), 0);
