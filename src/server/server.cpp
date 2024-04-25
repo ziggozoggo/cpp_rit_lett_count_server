@@ -2,19 +2,20 @@
 
 /* Constructors */
 EchoServer::EchoServer() noexcept : max_conn_(DEF_MAX_CONN), master_socket_(0) {
+  hello_message_ = DEF_START_MSG;
   address_.sin_port = htons(DEF_PORT);
   this->address_init();  
 }
 
 EchoServer::EchoServer(int port, int max_conn) noexcept : max_conn_(max_conn), master_socket_(0) {
+  hello_message_ = DEF_START_MSG;
   address_.sin_port = htons(port);
   this->address_init();
 }
 
 /* Main methods */
 void EchoServer::start_server() {
-	int opt = 1; 
-	int master_socket , addrlen , new_socket,
+	int addrlen , new_socket,
 		max_clients = 30 , activity, i , valread , sd;
 
   std::vector<int>client_socket(max_conn_);
@@ -28,39 +29,11 @@ void EchoServer::start_server() {
 	fd_set readfds; 
 		
 	//a message 
-	const char *message = "ECHO Daemon v1.0 \r\n"; 
+	// const char *message = "ECHO Daemon v1.0 \r\n"; 
 			
 	//create a master socket 
   this->set_master_socket();
-	
-  // if( (master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0) 
-	// { 
-	// 	perror("socket failed"); 
-	// 	exit(EXIT_FAILURE); 
-	// } 
-	
-	//set master socket to allow multiple connections , 
-	//this is just a good habit, it will work without this 
-	// if( setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, 
-	// 	sizeof(opt)) < 0 ) 
-	// { 
-	// 	perror("setsockopt"); 
-	// 	exit(EXIT_FAILURE); 
-	// } 
-	
-	//type of socket created 
-	// address.sin_family = AF_INET; 
-	// address.sin_addr.s_addr = INADDR_ANY; 
-	// address.sin_port = htons(config_.port); 
-		
-	//bind the socket to localhost port 8888 
-	if (bind(master_socket_, (struct sockaddr *)&address_, sizeof(address_))<0) 
-	{ 
-		perror("bind failed"); 
-		exit(EXIT_FAILURE); 
-	} 
-	
-  // printf("Listener on port %d \n", address_.sin_port); 
+  this->bind_master_socket();
 		
 	//try to specify maximum of 3 pending connections for the master socket 
 	if (listen(master_socket_, 3) < 0) 
@@ -121,7 +94,8 @@ void EchoServer::start_server() {
 			printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , new_socket , inet_ntoa(address_.sin_addr) , ntohs 
 				(address_.sin_port)); 
 		
-			//send new connection greeting message 
+			//send new connection greeting message
+      const char* message = hello_message_.c_str(); 
 			if( send(new_socket, message, strlen(message), 0) != strlen(message) ) 
 			{ 
 				perror("send"); 
@@ -201,11 +175,19 @@ void EchoServer::set_master_socket() {
   
   // Allow multiple connections
   int opt = 1;
-  int res_set = setsockopt(master_socket_, SOL_SOCKET, SO_REUSEADDR,
+  int setsock_code = setsockopt(master_socket_, SOL_SOCKET, SO_REUSEADDR,
                            (char *)&opt, sizeof(opt));
-  if (res_set < 0) {
+  if (setsock_code < 0) {
     //TODO throw error: "Set multiple connections to master socket failed"
     printf("Set multiple connections to master socket failed");
   }
   // std::cout << "HI" << std::endl;
+}
+
+void EchoServer::bind_master_socket() {
+  int bind_code = bind(master_socket_, (struct sockaddr *)&address_, sizeof(address_));
+  if (bind_code < 0) {
+    //TODO throw error: "Bind master socket to IP:port failed"
+    printf("Bind master socket to IP:port failed");
+  }
 }

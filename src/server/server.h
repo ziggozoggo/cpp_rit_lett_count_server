@@ -13,7 +13,7 @@
 #include <string.h>
 
 #define DEF_PORT 9090
-#define DEF_START_MSG "RIT LETT CNT SRVR v0.1"
+#define DEF_START_MSG "RIT LETT CNT SRVR v0.1\n\r"
 #define DEF_MAX_CONN 30
 
 class EchoServer {
@@ -26,12 +26,14 @@ class EchoServer {
 
   private:
     int max_conn_;
+    std::string hello_message_;
     sockaddr_in address_;
     //...
     int master_socket_;
 
     void address_init() noexcept;
     void set_master_socket();
+    void bind_master_socket();
 };
 
 #endif // SRC_SERVER_H_
