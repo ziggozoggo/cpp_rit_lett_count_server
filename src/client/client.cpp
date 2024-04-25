@@ -22,6 +22,7 @@ void SimlpeClientTCP::client_start() {
   } 
   catch (const ClientServerConnectionLost& err) {
     std::cout << "Connection to server lost" << std::endl;
+    this->reconnect_to_server(10);
   } 
 
   close(client_socket);
@@ -77,6 +78,12 @@ int  SimlpeClientTCP::send_data_to_server(int client_socket, std::string data) {
     throw ClientServerConnectionLost("Connection to server lost");
   }
   return 0;
+}
+
+void SimlpeClientTCP::reconnect_to_server(int sleep_time) {
+  std::cout << "Reconnect in " << sleep_time << " seconds" << std::endl;
+  sleep(sleep_time);
+  this->client_start();
 }
 
 void SimlpeClientTCP::print_message(std::string str) noexcept {

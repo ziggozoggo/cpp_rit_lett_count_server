@@ -30,6 +30,7 @@ class SimlpeClientTCP {
     int connect_to_server(int client_socket);
     int send_data_to_server(int client_socket, std::string data);
     void client_main_loop(int client_socket);
+    void reconnect_to_server(int sleep_time);
 
     void print_message(std::string) noexcept;
 };
