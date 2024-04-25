@@ -16,12 +16,6 @@
 #define DEF_START_MSG "RIT LETT CNT SRVR v0.1"
 #define DEF_MAX_CONN 30
 
-struct EchoServerConfig {
-  int port;
-  std::size_t max_conn;
-  std::string start_message;
-}; 
-
 class EchoServer {
   public:
     EchoServer() noexcept;
@@ -31,7 +25,10 @@ class EchoServer {
     void start_server();
 
   private:
-    EchoServerConfig config_;
+    int max_conn_;
+    sockaddr_in address_;
+
+    void address_init() noexcept;
 };
 
 #endif // SRC_SERVER_H_

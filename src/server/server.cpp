@@ -1,16 +1,15 @@
 #include "server.h"
 
 /* Constructors */
-EchoServer::EchoServer() noexcept {
-  config_.port = DEF_PORT;
-  config_.max_conn = DEF_MAX_CONN;
-  config_.start_message = DEF_START_MSG;
+EchoServer::EchoServer() noexcept : max_conn_(DEF_MAX_CONN) {
+  address_.sin_port = htons(DEF_PORT);
+  this->address_init();
+  
 }
 
-EchoServer::EchoServer(int port, int max_conn) noexcept {
-  config_.port = port;
-  config_.max_conn = max_conn;
-  config_.start_message = DEF_START_MSG;
+EchoServer::EchoServer(int port, int max_conn) noexcept : max_conn_(max_conn) {
+  address_.sin_port = htons(port);
+  this->address_init();
 }
 
 /* Main methods */
@@ -19,7 +18,7 @@ void EchoServer::start_server() {
 	int master_socket , addrlen , new_socket , client_socket[30] , 
 		max_clients = 30 , activity, i , valread , sd; 
 	int max_sd; 
-	struct sockaddr_in address; 
+	// struct sockaddr_in address; 
 		
 	char buffer[1025]; //data buffer of 1K 
 		
@@ -52,17 +51,17 @@ void EchoServer::start_server() {
 	} 
 	
 	//type of socket created 
-	address.sin_family = AF_INET; 
-	address.sin_addr.s_addr = INADDR_ANY; 
-	address.sin_port = htons(config_.port); 
+	// address.sin_family = AF_INET; 
+	// address.sin_addr.s_addr = INADDR_ANY; 
+	// address.sin_port = htons(config_.port); 
 		
 	//bind the socket to localhost port 8888 
-	if (bind(master_socket, (struct sockaddr *)&address, sizeof(address))<0) 
+	if (bind(master_socket, (struct sockaddr *)&address_, sizeof(address_))<0) 
 	{ 
 		perror("bind failed"); 
 		exit(EXIT_FAILURE); 
 	} 
-	printf("Listener on port %d \n", config_.port); 
+	printf("Listener on port %d \n", address_.sin_port); 
 		
 	//try to specify maximum of 3 pending connections for the master socket 
 	if (listen(master_socket, 3) < 0) 
@@ -72,7 +71,7 @@ void EchoServer::start_server() {
 	} 
 		
 	//accept the incoming connection 
-	addrlen = sizeof(address); 
+	addrlen = sizeof(address_); 
 	puts("Waiting for connections ..."); 
 		
 	while(true) 
@@ -113,15 +112,15 @@ void EchoServer::start_server() {
 		if (FD_ISSET(master_socket, &readfds)) 
 		{ 
 			if ((new_socket = accept(master_socket, 
-					(struct sockaddr *)&address, (socklen_t*)&addrlen))<0) 
+					(struct sockaddr *)&address_, (socklen_t*)&addrlen))<0) 
 			{ 
 				perror("accept"); 
 				exit(EXIT_FAILURE); 
 			} 
 			
 			//inform user of socket number - used in send and receive commands 
-			printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , new_socket , inet_ntoa(address.sin_addr) , ntohs 
-				(address.sin_port)); 
+			printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , new_socket , inet_ntoa(address_.sin_addr) , ntohs 
+				(address_.sin_port)); 
 		
 			//send new connection greeting message 
 			if( send(new_socket, message, strlen(message), 0) != strlen(message) ) 
@@ -157,9 +156,9 @@ void EchoServer::start_server() {
 				if ((valread = read( sd , buffer, 1024)) == 0) 
 				{ 
 					//Somebody disconnected , get his details and print 
-					getpeername(sd , (struct sockaddr*)&address , (socklen_t*)&addrlen); 
+					getpeername(sd , (struct sockaddr*)&address_ , (socklen_t*)&addrlen); 
 					printf("Host disconnected , ip %s , port %d \n" , 
-						inet_ntoa(address.sin_addr) , ntohs(address.sin_port)); 
+						inet_ntoa(address_.sin_addr) , ntohs(address_.sin_port)); 
 						
 					//Close the socket and mark as 0 in list for reuse 
 					close( sd ); 
@@ -183,7 +182,13 @@ void EchoServer::start_server() {
 /* Utilities methods */
 std::string EchoServer::get_info() noexcept {
   char buffer [BUFSIZ];
-  sprintf (buffer, "PORT: %d, MAX_CONN: %ld\n", 
-           config_.port, config_.max_conn);
+  sprintf (buffer, "PORT: %d, MAX_CONN: %d\n", 
+           address_.sin_port, max_conn_);
   return buffer;
+}
+
+/* Private utils */
+void EchoServer::address_init() noexcept {
+  address_.sin_family = AF_INET;
+  address_.sin_addr.s_addr = INADDR_ANY;
 }
