@@ -1,13 +1,12 @@
 #include "server.h"
 
 /* Constructors */
-EchoServer::EchoServer() noexcept : max_conn_(DEF_MAX_CONN) {
+EchoServer::EchoServer() noexcept : max_conn_(DEF_MAX_CONN), master_socket_(0) {
   address_.sin_port = htons(DEF_PORT);
-  this->address_init();
-  
+  this->address_init();  
 }
 
-EchoServer::EchoServer(int port, int max_conn) noexcept : max_conn_(max_conn) {
+EchoServer::EchoServer(int port, int max_conn) noexcept : max_conn_(max_conn), master_socket_(0) {
   address_.sin_port = htons(port);
   this->address_init();
 }
@@ -15,8 +14,11 @@ EchoServer::EchoServer(int port, int max_conn) noexcept : max_conn_(max_conn) {
 /* Main methods */
 void EchoServer::start_server() {
 	int opt = 1; 
-	int master_socket , addrlen , new_socket , client_socket[30] , 
-		max_clients = 30 , activity, i , valread , sd; 
+	int master_socket , addrlen , new_socket,
+		max_clients = 30 , activity, i , valread , sd;
+
+  std::vector<int>client_socket(max_conn_);
+
 	int max_sd; 
 	// struct sockaddr_in address; 
 		
@@ -27,28 +29,24 @@ void EchoServer::start_server() {
 		
 	//a message 
 	const char *message = "ECHO Daemon v1.0 \r\n"; 
-	
-	//initialise all client_socket[] to 0 so not checked 
-	for (i = 0; i < max_clients; i++) 
-	{ 
-		client_socket[i] = 0; 
-	} 
-		
+			
 	//create a master socket 
-	if( (master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0) 
-	{ 
-		perror("socket failed"); 
-		exit(EXIT_FAILURE); 
-	} 
+  this->set_master_socket();
+	
+  // if( (master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0) 
+	// { 
+	// 	perror("socket failed"); 
+	// 	exit(EXIT_FAILURE); 
+	// } 
 	
 	//set master socket to allow multiple connections , 
 	//this is just a good habit, it will work without this 
-	if( setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, 
-		sizeof(opt)) < 0 ) 
-	{ 
-		perror("setsockopt"); 
-		exit(EXIT_FAILURE); 
-	} 
+	// if( setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, 
+	// 	sizeof(opt)) < 0 ) 
+	// { 
+	// 	perror("setsockopt"); 
+	// 	exit(EXIT_FAILURE); 
+	// } 
 	
 	//type of socket created 
 	// address.sin_family = AF_INET; 
@@ -56,15 +54,16 @@ void EchoServer::start_server() {
 	// address.sin_port = htons(config_.port); 
 		
 	//bind the socket to localhost port 8888 
-	if (bind(master_socket, (struct sockaddr *)&address_, sizeof(address_))<0) 
+	if (bind(master_socket_, (struct sockaddr *)&address_, sizeof(address_))<0) 
 	{ 
 		perror("bind failed"); 
 		exit(EXIT_FAILURE); 
 	} 
-	printf("Listener on port %d \n", address_.sin_port); 
+	
+  // printf("Listener on port %d \n", address_.sin_port); 
 		
 	//try to specify maximum of 3 pending connections for the master socket 
-	if (listen(master_socket, 3) < 0) 
+	if (listen(master_socket_, 3) < 0) 
 	{ 
 		perror("listen"); 
 		exit(EXIT_FAILURE); 
@@ -80,8 +79,8 @@ void EchoServer::start_server() {
 		FD_ZERO(&readfds); 
 	
 		//add master socket to set 
-		FD_SET(master_socket, &readfds); 
-		max_sd = master_socket; 
+		FD_SET(master_socket_, &readfds); 
+		max_sd = master_socket_; 
 			
 		//add child sockets to set 
 		for ( i = 0 ; i < max_clients ; i++) 
@@ -109,9 +108,9 @@ void EchoServer::start_server() {
 			
 		//If something happened on the master socket , 
 		//then its an incoming connection 
-		if (FD_ISSET(master_socket, &readfds)) 
+		if (FD_ISSET(master_socket_, &readfds)) 
 		{ 
-			if ((new_socket = accept(master_socket, 
+			if ((new_socket = accept(master_socket_, 
 					(struct sockaddr *)&address_, (socklen_t*)&addrlen))<0) 
 			{ 
 				perror("accept"); 
@@ -191,4 +190,22 @@ std::string EchoServer::get_info() noexcept {
 void EchoServer::address_init() noexcept {
   address_.sin_family = AF_INET;
   address_.sin_addr.s_addr = INADDR_ANY;
+}
+
+void EchoServer::set_master_socket() {
+  master_socket_ = socket(AF_INET, SOCK_STREAM, 0);
+  if (master_socket_ == 0) {
+    //TODO throw error: "Set master socket failed"
+    printf("Set master socket failed");
+  }
+  
+  // Allow multiple connections
+  int opt = 1;
+  int res_set = setsockopt(master_socket_, SOL_SOCKET, SO_REUSEADDR,
+                           (char *)&opt, sizeof(opt));
+  if (res_set < 0) {
+    //TODO throw error: "Set multiple connections to master socket failed"
+    printf("Set multiple connections to master socket failed");
+  }
+  // std::cout << "HI" << std::endl;
 }

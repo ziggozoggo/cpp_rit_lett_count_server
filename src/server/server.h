@@ -27,8 +27,11 @@ class EchoServer {
   private:
     int max_conn_;
     sockaddr_in address_;
+    //...
+    int master_socket_;
 
     void address_init() noexcept;
+    void set_master_socket();
 };
 
 #endif // SRC_SERVER_H_
