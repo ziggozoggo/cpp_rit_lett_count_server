@@ -4,7 +4,6 @@
 
 int main() {
   EchoServer a;
-  //std::cout << a.get_info() << std::endl;
-  a.start_server(echo_func);
+  a.start_server(count_letter_frequency);
   return 0;
 }

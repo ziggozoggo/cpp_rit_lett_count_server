@@ -13,6 +13,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "count_letter_frq.h"
+
 #define DEF_PORT 9090
 #define DEF_MAX_CONN 30
 #define DEF_PENDING_CONN 3

@@ -13,7 +13,7 @@ std::string count_letter_frequency(std::string str) {
     return result;
   }
   
-  for(int i = 0; i < str.length(); i++) {
+  for(std::size_t i = 0; i < str.length(); i++) {
     if (isalpha(str[i])) {
       letters_dict[str[i]]++;
     }
@@ -32,7 +32,7 @@ std::string get_table_header(std::string msg) {
   const char *sep = "|";
 
   char buff[BUFSIZ] = {0};
-  sprintf(buff, "%-8s %s %s\n", message, sep, msg.c_str());
+  sprintf(buff, "\n%-8s %s %s\n", message, sep, msg.c_str());
 
   std::string result = buff;
   return result;
