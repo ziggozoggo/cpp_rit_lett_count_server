@@ -15,6 +15,7 @@
 
 #define DEF_PORT 9090
 #define DEF_IP "127.0.0.1"
+#define DEF_RECONNECT_DELAY 5
 
 class SimlpeClientTCP {
   public:
@@ -24,6 +25,8 @@ class SimlpeClientTCP {
     void client_start();
   private:
     sockaddr_in client_;
+    bool is_reconnecting_;
+    int reconnect_delay_;
 
     void client_init(int port, std::string ip_addr) noexcept;
     int create_socket();

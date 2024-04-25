@@ -1,11 +1,11 @@
 #include "client.h"
 
 /* Constructors */
-SimlpeClientTCP::SimlpeClientTCP() noexcept {
+SimlpeClientTCP::SimlpeClientTCP() noexcept : is_reconnecting_(false), reconnect_delay_(DEF_RECONNECT_DELAY) {
   this->client_init(DEF_PORT, DEF_IP);
 }
 
-SimlpeClientTCP::SimlpeClientTCP(int port, std::string ip_addr) noexcept {
+SimlpeClientTCP::SimlpeClientTCP(int port, std::string ip_addr) noexcept : is_reconnecting_(false), reconnect_delay_(DEF_RECONNECT_DELAY) {
   this->client_init(port, ip_addr);
 }
 
@@ -19,10 +19,14 @@ void SimlpeClientTCP::client_start() {
   } 
   catch (const ClientConnectToServerFailed& err) {
     std::cout << "Connect to server failed" << std::endl;
+    if (is_reconnecting_) {
+      this->reconnect_to_server(reconnect_delay_);
+    }
   } 
   catch (const ClientServerConnectionLost& err) {
     std::cout << "Connection to server lost" << std::endl;
-    this->reconnect_to_server(10);
+    is_reconnecting_ = true;
+    this->reconnect_to_server(reconnect_delay_);
   } 
 
   close(client_socket);
