@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include "../server/count_letter_frq.h"
+
+#include <gtest/gtest.h>
 
 TEST(count_letter_suite, first_test) {
   std::string in_data = "12356 \t\t\t 00 _^&";

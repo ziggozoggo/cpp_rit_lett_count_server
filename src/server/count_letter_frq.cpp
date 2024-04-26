@@ -1,6 +1,5 @@
 #include "count_letter_frq.h"
 
-
 static std::string get_table_data(const char letter, int count);
 static bool is_msg_has_letters(const std::string& msg);
 
@@ -17,14 +16,14 @@ std::string count_letter_frequency(const std::string& str) {
   if (!is_msg_has_letters(str)) {
     return result;
   }
-  
-  for(std::size_t i = 0; i < str.length(); i++) {
+
+  for (std::size_t i = 0; i < str.length(); i++) {
     if (isalpha(str[i])) {
       letters_dict[str[i]]++;
     }
   }
 
-  for(iter = letters_dict.begin(); iter != letters_dict.end(); iter++) {
+  for (iter = letters_dict.begin(); iter != letters_dict.end(); iter++) {
     std::string column = get_table_data(iter->first, iter->second);
     result += column;
   }
@@ -38,8 +37,8 @@ std::string count_letter_frequency(const std::string& str) {
  * @return Строка таблицы заданного формата
  */
 std::string get_table_header(const std::string& msg) {
-  const char *message = "Message";
-  const char *sep = "|";
+  const char* message = "Message";
+  const char* sep = "|";
 
   char buff[BUFSIZ] = {0};
   sprintf(buff, "\n%-8s %s %s\n", message, sep, msg.c_str());
@@ -51,16 +50,16 @@ std::string get_table_header(const std::string& msg) {
 std::string get_table_data(const char letter, int count) {
   char buff[BUFSIZ] = {0};
 
-  const char *sep = "|";
+  const char* sep = "|";
   sprintf(buff, "%-8c %s %d\n", letter, sep, count);
 
-   std::string result = buff;
-   return result;
+  std::string result = buff;
+  return result;
 }
 
 bool is_msg_has_letters(const std::string& msg) {
   bool result = false;
-  for(const char& c : msg) {
+  for (const char& c : msg) {
     if (isalpha(c)) {
       result = true;
       break;

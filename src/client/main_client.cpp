@@ -1,10 +1,12 @@
 #include <getopt.h>
+
 #include <vector>
+
 #include "client.h"
 
-std::string get_launch_parameters(int argc, char* argv[], int *port, bool *err);
+std::string get_launch_parameters(int argc, char *argv[], int *port, bool *err);
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   int port = 0;
   bool is_err = false;
   std::string ip_addr = get_launch_parameters(argc, argv, &port, &is_err);
@@ -12,14 +14,15 @@ int main(int argc, char* argv[]) {
   if (is_err) {
     return 1;
   }
-  
+
   SimlpeClientTCP client(port, ip_addr);
   client.client_start();
 
   return 0;
 }
 
-std::string get_launch_parameters(int argc, char* argv[], int *port, bool *err) {
+std::string get_launch_parameters(int argc, char *argv[], int *port,
+                                  bool *err) {
   int get_opt_index = 0;
   std::string ip_addr = "";
   std::string port_str = "";

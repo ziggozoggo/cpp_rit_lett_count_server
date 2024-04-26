@@ -1,36 +1,37 @@
 #include "client.h"
 
 /* Constructors */
-SimlpeClientTCP::SimlpeClientTCP() noexcept : is_reconnecting_(false), reconnect_delay_(DEF_RECONNECT_DELAY) {
+SimlpeClientTCP::SimlpeClientTCP() noexcept
+    : is_reconnecting_(false), reconnect_delay_(DEF_RECONNECT_DELAY) {
   this->client_init(DEF_PORT, DEF_IP);
 }
 
-SimlpeClientTCP::SimlpeClientTCP(const int& port, const std::string& ip_addr) noexcept : is_reconnecting_(false), reconnect_delay_(DEF_RECONNECT_DELAY) {
+SimlpeClientTCP::SimlpeClientTCP(const int& port,
+                                 const std::string& ip_addr) noexcept
+    : is_reconnecting_(false), reconnect_delay_(DEF_RECONNECT_DELAY) {
   this->client_init(port, ip_addr);
 }
 
 /* Main methods */
 void SimlpeClientTCP::client_start() {
   int client_socket = this->create_socket();
-  
+
   try {
     this->connect_to_server(client_socket);
     if (!is_reconnecting_) {
       this->print_welcome_message();
     }
     this->client_main_loop(client_socket);
-  } 
-  catch (const ClientConnectToServerFailed& err) {
+  } catch (const ClientConnectToServerFailed& err) {
     std::cout << "Connect to server failed" << std::endl;
     if (is_reconnecting_) {
       this->reconnect_to_server(reconnect_delay_);
     }
-  } 
-  catch (const ClientServerConnectionLost& err) {
+  } catch (const ClientServerConnectionLost& err) {
     std::cout << "Connection to server lost" << std::endl;
     is_reconnecting_ = true;
     this->reconnect_to_server(reconnect_delay_);
-  } 
+  }
 
   close(client_socket);
 }
@@ -51,7 +52,8 @@ int SimlpeClientTCP::create_socket() {
 }
 
 int SimlpeClientTCP::connect_to_server(int client_socket) {
-  int connect_res = connect(client_socket, (sockaddr *)&client_, sizeof(client_));
+  int connect_res =
+      connect(client_socket, (sockaddr*)&client_, sizeof(client_));
   if (connect_res == -1) {
     throw ClientConnectToServerFailed("Connect to server failed");
   }
@@ -62,7 +64,7 @@ void SimlpeClientTCP::client_main_loop(int client_socket) {
   char buf[BUFSIZ] = {0};
   std::string user_input;
 
-  while(true) {
+  while (true) {
     std::cout << "> ";
     getline(std::cin, user_input);
 
@@ -79,11 +81,11 @@ void SimlpeClientTCP::client_main_loop(int client_socket) {
       throw ClientServerConnectionLost("Connection to server lost");
     }
 
-    this->print_message(std::string(buf, bytes_recieved)); 
+    this->print_message(std::string(buf, bytes_recieved));
   }
 }
 
-int  SimlpeClientTCP::send_data_to_server(int client_socket, std::string data) {
+int SimlpeClientTCP::send_data_to_server(int client_socket, std::string data) {
   int send_res = send(client_socket, data.c_str(), data.size() + 1, 0);
   if (send_res == -1) {
     std::cout << "Could not send data to server" << std::endl;
