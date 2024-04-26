@@ -23,7 +23,7 @@
 class EchoServer {
   public:
     EchoServer() noexcept;
-    EchoServer(int port, int max_conn) noexcept;
+    EchoServer(const int& port, const int& max_conn) noexcept;
 
     std::string get_info() noexcept;
     void start_server(std::string (*func)(const std::string&));

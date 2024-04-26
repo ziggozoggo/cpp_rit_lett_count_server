@@ -20,7 +20,7 @@
 class SimlpeClientTCP {
   public:
     SimlpeClientTCP() noexcept;
-    SimlpeClientTCP(int port, std::string ip_addr) noexcept;
+    SimlpeClientTCP(const int& port, const std::string& ip_addr) noexcept;
 
     void client_start();
   private:

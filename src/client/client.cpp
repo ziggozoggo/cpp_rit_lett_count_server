@@ -5,7 +5,7 @@ SimlpeClientTCP::SimlpeClientTCP() noexcept : is_reconnecting_(false), reconnect
   this->client_init(DEF_PORT, DEF_IP);
 }
 
-SimlpeClientTCP::SimlpeClientTCP(int port, std::string ip_addr) noexcept : is_reconnecting_(false), reconnect_delay_(DEF_RECONNECT_DELAY) {
+SimlpeClientTCP::SimlpeClientTCP(const int& port, const std::string& ip_addr) noexcept : is_reconnecting_(false), reconnect_delay_(DEF_RECONNECT_DELAY) {
   this->client_init(port, ip_addr);
 }
 

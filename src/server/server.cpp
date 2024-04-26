@@ -6,7 +6,7 @@ EchoServer::EchoServer() noexcept : max_conn_(DEF_MAX_CONN), master_socket_(0), 
   this->address_init();  
 }
 
-EchoServer::EchoServer(int port, int max_conn) noexcept : max_conn_(max_conn), master_socket_(0), connections_count_(0) {
+EchoServer::EchoServer(const int& port, const int& max_conn) noexcept : max_conn_(max_conn), master_socket_(0), connections_count_(0) {
   address_.sin_port = htons(port);
   this->address_init();
 }
