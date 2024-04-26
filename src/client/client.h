@@ -36,6 +36,7 @@ class SimlpeClientTCP {
     void reconnect_to_server(int sleep_time);
 
     void print_message(std::string) noexcept;
+    void print_welcome_message() noexcept;
 };
 
 #endif // SRC_CLIENT_H_

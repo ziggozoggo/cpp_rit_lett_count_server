@@ -15,6 +15,9 @@ void SimlpeClientTCP::client_start() {
   
   try {
     this->connect_to_server(client_socket);
+    if (!is_reconnecting_) {
+      this->print_welcome_message();
+    }
     this->client_main_loop(client_socket);
   } 
   catch (const ClientConnectToServerFailed& err) {
@@ -92,4 +95,10 @@ void SimlpeClientTCP::reconnect_to_server(int sleep_time) {
 
 void SimlpeClientTCP::print_message(std::string str) noexcept {
   std::cout << "SERVER> " << str << std::endl;
+}
+
+void SimlpeClientTCP::print_welcome_message() noexcept {
+  std::cout << "Connected to server" << std::endl;
+  std::cout << "'?' - for get number of active sessoins" << std::endl;
+  std::cout << "'#' - for exit" << std::endl;
 }
