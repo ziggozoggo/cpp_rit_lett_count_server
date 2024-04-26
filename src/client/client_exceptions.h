@@ -1,3 +1,6 @@
+#ifndef SRC_CLIENT_EXCEPTIONS_H_
+#define SRC_CLIENT_EXCEPTIONS_H_
+
 #include <exception>
 #include <string>
 
@@ -33,3 +36,5 @@ class ClientServerConnectionLost: public std::exception {
   private:
     std::string  message_;
 };
+
+#endif // SRC_CLIENT_EXCEPTIONS_H_

@@ -14,6 +14,7 @@
 #include <ctype.h>
 
 #include "count_letter_frq.h"
+#include "server_exceptions.h"
 
 #define DEF_PORT 9090
 #define DEF_MAX_CONN 30

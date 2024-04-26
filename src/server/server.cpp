@@ -36,8 +36,7 @@ void EchoServer::address_init() noexcept {
 void EchoServer::set_master_socket() {
   master_socket_ = socket(AF_INET, SOCK_STREAM, 0);
   if (master_socket_ == 0) {
-    //TODO throw error: "Set master socket failed"
-    printf("Set master socket failed");
+    throw ServerBindSocketError("Set master socket failed");
   }
   
   // Allow multiple connections
@@ -45,25 +44,21 @@ void EchoServer::set_master_socket() {
   int setsock_code = setsockopt(master_socket_, SOL_SOCKET, SO_REUSEADDR,
                            (char *)&opt, sizeof(opt));
   if (setsock_code < 0) {
-    //TODO throw error: "Set multiple connections to master socket failed"
-    printf("Set multiple connections to master socket failed");
+    throw ServerBindSocketError("Set multiple connections to master socket failed");
   }
-  // std::cout << "HI" << std::endl;
 }
 
 void EchoServer::bind_master_socket() {
   int bind_code = bind(master_socket_, (struct sockaddr *)&address_, sizeof(address_));
   if (bind_code < 0) {
-    //TODO throw error: "Bind master socket to IP:port failed"
-    printf("Bind master socket to IP:port failed");
+    throw ServerBindPortIPError("Bind master socket to IP:port failed; port used by another process ?");
   }
 }
 
 int EchoServer::listen_master_socket() {
   int listen_code = listen(master_socket_, DEF_PENDING_CONN);
   if (listen_code < 0) {
-    //TODO throw error: "Set listen master socket failed"
-    printf("Set listen master socket failed");
+    throw ServerBindSocketError("Set listen master socket failed");
   }
   puts("Waiting for connections ...");
   return sizeof(address_); 
@@ -102,16 +97,14 @@ void EchoServer::main_server_loop(int *addrlen, std::string (*func)(std::string)
     // Set activity; timeout is NULL == inf
     activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
     if ((activity < 0) && (errno != EINTR)) {
-      //TODO throw error: "Activity select error"
-      printf("Activity select error");
+      throw ServerListenError("Activity select error");
     }
 
     // Incoming connection
     if (FD_ISSET(master_socket_, &readfds)) {
       new_socket = accept(master_socket_, (struct sockaddr *)&address_, (socklen_t*)addrlen);
       if (new_socket < 0) {
-        //TODO throw error: "Accept connection failed"
-        printf("Accept connection failed");
+        throw ServerListenError("Accept connection failed");
       }
       //inform user of socket number - used in send and receive commands 
 			printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , new_socket , inet_ntoa(address_.sin_addr) , ntohs 
@@ -143,10 +136,10 @@ void EchoServer::main_server_loop(int *addrlen, std::string (*func)(std::string)
           client_socket[i] = 0;
           if (connections_count_) connections_count_--;
           
-          //TODO: Log client SIGPIPE
-          if (valread == -1) {
-            std::cout << "149: "<< errno << " valread is " << valread << std::endl;
-          } 
+          // SIGPIPE
+          // if (valread == -1) {
+          //   std::cout << "149: "<< errno << " valread is " << valread << std::endl;
+          // } 
         } else {
           buffer[valread] = '\0';
           std::string return_str;
