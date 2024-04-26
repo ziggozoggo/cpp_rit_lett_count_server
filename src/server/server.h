@@ -30,8 +30,8 @@ class EchoServer {
   private:
     int max_conn_;
     sockaddr_in address_;
-    //...
     int master_socket_;
+    int connections_count_;
 
     void address_init() noexcept;
     void set_master_socket();
