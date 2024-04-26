@@ -2,9 +2,14 @@
 
 
 static std::string get_table_data(const char letter, int count);
-static bool is_msg_has_letters(std::string msg);
+static bool is_msg_has_letters(const std::string& msg);
 
-std::string count_letter_frequency(std::string str) {
+/**
+ * @brief Подсчёт частоты букв латинского алфавита в переданной строке
+ * @param str Строка
+ * @return Таблица заданного формата
+ */
+std::string count_letter_frequency(const std::string& str) {
   std::map<char, int> letters_dict;
   std::map<char, int>::iterator iter;
 
@@ -27,7 +32,12 @@ std::string count_letter_frequency(std::string str) {
   return result;
 }
 
-std::string get_table_header(std::string msg) {
+/**
+ * @brief Сформировать заголовок таблицы
+ * @param str Строка
+ * @return Строка таблицы заданного формата
+ */
+std::string get_table_header(const std::string& msg) {
   const char *message = "Message";
   const char *sep = "|";
 
@@ -48,9 +58,9 @@ std::string get_table_data(const char letter, int count) {
    return result;
 }
 
-bool is_msg_has_letters(std::string msg) {
+bool is_msg_has_letters(const std::string& msg) {
   bool result = false;
-  for(char& c : msg) {
+  for(const char& c : msg) {
     if (isalpha(c)) {
       result = true;
       break;

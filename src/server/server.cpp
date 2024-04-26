@@ -12,7 +12,7 @@ EchoServer::EchoServer(int port, int max_conn) noexcept : max_conn_(max_conn), m
 }
 
 /* Main methods */
-void EchoServer::start_server(std::string (*func)(std::string)) {
+void EchoServer::start_server(std::string (*func)(const std::string&)) {
   this->set_master_socket();
   this->bind_master_socket();
   int addrlen = this->listen_master_socket();
@@ -64,7 +64,7 @@ int EchoServer::listen_master_socket() {
   return sizeof(address_); 
 }
 
-void EchoServer::main_server_loop(int *addrlen, std::string (*func)(std::string)) {
+void EchoServer::main_server_loop(int *addrlen, std::string (*func)(const std::string&)) {
   int max_sd = 0;
   int sd = 0;
   int activity = 0;
