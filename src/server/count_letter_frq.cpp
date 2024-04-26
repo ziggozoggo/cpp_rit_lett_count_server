@@ -1,6 +1,6 @@
 #include "count_letter_frq.h"
 
-static std::string get_table_header(std::string msg);
+
 static std::string get_table_data(const char letter, int count);
 static bool is_msg_has_letters(std::string msg);
 
