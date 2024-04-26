@@ -1,8 +1,10 @@
 ## TCP C++ Server/Client
 
-Консольные приложения (Ubuntu Linux).
+Консольные приложения (Ubuntu Linux). Сервер по запросу клиента возвращает количество букв латинского алфавита в переданной строке.
 
-Сервер по запросу клиента возвращает количество букв латинского алфавита в переданной строке.
+![alt text][client_server_scenario]
+
+[client_server_scenario]: ../materials/img/client_server.gif "Client server scenario"
 
 ### Сброка и запуск
 
