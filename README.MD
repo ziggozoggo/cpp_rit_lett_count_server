@@ -4,7 +4,7 @@
 
 ![alt text][client_server_scenario]
 
-[client_server_scenario]: ../materials/img/client_server.gif "Client server scenario"
+[client_server_scenario]: ./materials/img/client_server.gif "Client server scenario"
 
 ### Сброка и запуск
 
