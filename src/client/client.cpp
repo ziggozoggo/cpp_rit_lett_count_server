@@ -66,6 +66,11 @@ void SimlpeClientTCP::client_main_loop(int client_socket) {
     std::cout << "> ";
     getline(std::cin, user_input);
 
+    if (user_input == "#") {
+      std::cout << "Good bye and have a nice day" << std::endl;
+      break;
+    }
+
     // Send data to server
     this->send_data_to_server(client_socket, user_input);
     int bytes_recieved = recv(client_socket, buf, BUFSIZ, 0);
