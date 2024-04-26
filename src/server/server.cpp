@@ -149,28 +149,23 @@ void EchoServer::main_server_loop(int *addrlen, std::string (*func)(std::string)
           } 
         } else {
           buffer[valread] = '\0';
+          std::string return_str;
+          
           if ((strlen(buffer) == 1) && (buffer[0] == '?')) {
             std::cout << "Return connection count..." << std::endl;
-            char tmp_buff[BUFSIZ] = {0};
-            sprintf (tmp_buff, "Number of active sessions: %d\n", connections_count_ + 1);
-            int send_res = send(sd, tmp_buff, strlen(tmp_buff), 0);
-            if (send_res < 0) {
-              printf("Send message failed....");
-            }
+            char return_buff[BUFSIZ] = {0};
+            sprintf (return_buff, "Number of active sessions: %d\n", connections_count_ + 1);
+            return_str = return_buff;
           } else {
-            std::string tmp = func(std::string(buffer, valread + 1));
-            int send_res = send(sd, tmp.c_str(), strlen(tmp.c_str()), 0);
-            if (send_res < 0) {
+            return_str = func(std::string(buffer, valread + 1));
+          }
+          
+          int send_res = send(sd, return_str.c_str(), strlen(return_str.c_str()), 0);
+          if (send_res < 0) {
               printf("Send message failed....");
-            }
           }
         }
       }
     }
   }
-}
-
-/* EXPERIMENTS */
-std::string echo_func(std::string str) {
-  return str;
 }

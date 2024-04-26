@@ -40,7 +40,5 @@ class EchoServer {
     void main_server_loop(int *addrlen, std::string (*func)(std::string));
 };
 
-std::string echo_func(std::string str);
-
 #endif // SRC_SERVER_H_
 

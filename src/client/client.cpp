@@ -103,7 +103,7 @@ void SimlpeClientTCP::print_message(std::string str) noexcept {
 }
 
 void SimlpeClientTCP::print_welcome_message() noexcept {
-  std::cout << "Connected to server" << std::endl;
+  std::cout << "Connected to server 'Get Letters Frequency'" << std::endl;
   std::cout << "'?' - for get number of active sessoins" << std::endl;
   std::cout << "'#' - for exit" << std::endl;
 }
